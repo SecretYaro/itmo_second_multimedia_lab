@@ -18,5 +18,9 @@ final playerProvider = Provider<AudioPlayer>((ref) {
       ref.state.play();
     }
   });
-  return AudioPlayer()..setAsset(audioString);
+  return AudioPlayer()
+    ..setAsset(audioString)
+    ..playingStream.listen((state) {
+      ref.read(soundOnProvider.notifier).state = ref.state.playing;
+    });
 });

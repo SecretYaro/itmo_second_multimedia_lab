@@ -14,9 +14,9 @@ class MainImageWidget extends HookConsumerWidget {
     final index = ref.watch(currentIndexProvider);
     final image = images.values.toList()[index];
     return AnimatedSwitcher(
-      key: ValueKey(image),
       duration: kThemeAnimationDuration,
       child: Column(
+        key: ValueKey(image),
         children: [
           Flexible(
             child: Image.asset('images/$image', fit: BoxFit.fitHeight),

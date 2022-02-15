@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:itmo_second_multimedia_lab/providers/auto_scroll_provider.dart';
 import 'package:itmo_second_multimedia_lab/providers/current_index_provider.dart';
 import 'package:itmo_second_multimedia_lab/providers/sound_play_provider.dart';
@@ -25,13 +28,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends ConsumerWidget {
+class MyHomePage extends HookConsumerWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
     ref.watch(playerProvider);
     ref.watch(autoScrollProvider);
+    final textController = useTextEditingController();
+    if (textController.text.isEmpty) {
+      textController.text = ref.watch(timeToScrollProvider).toString();
+    }
+
     final isPlayAuto = !ref.watch(pauseProvider);
     final isAudioPlaying = ref.watch(soundOnProvider);
     return Scaffold(
@@ -61,15 +69,44 @@ class MyHomePage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       FloatingActionButton(
-                        onPressed: () =>
-                            ref.read(pauseProvider.notifier).state = (isPlayAuto),
-                        child: Icon(isPlayAuto ? Icons.pause : Icons.play_arrow),
+                        onPressed: () => ref
+                            .read(pauseProvider.notifier)
+                            .state = (isPlayAuto),
+                        child:
+                            Icon(isPlayAuto ? Icons.pause : Icons.play_arrow),
                       ),
                       FloatingActionButton(
-                        onPressed: () =>
-                        ref.read(soundOnProvider.notifier).state = (!isAudioPlaying),
-                        child: Icon(isAudioPlaying ? Icons.volume_off : Icons.volume_up_rounded),
+                        onPressed: () => ref
+                            .read(soundOnProvider.notifier)
+                            .state = (!isAudioPlaying),
+                        child: Icon(isAudioPlaying
+                            ? Icons.volume_off
+                            : Icons.volume_up_rounded),
                       ),
+                      SizedBox(
+                        width: 100,
+                        child: Material(
+                          child: TextFormField(
+                            controller: textController,
+                            maxLength: 5,
+                            validator: (text) {
+                              final number = int.tryParse(text ?? '');
+                              if (number == null) {
+                                return "Error";
+                              }
+                              return null;
+                            },
+                            onChanged: (text) {
+                              ref.read(timeToScrollProvider.notifier).state =
+                                  int.parse(text);
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]')),
+                            ],
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 )

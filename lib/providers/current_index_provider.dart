@@ -13,7 +13,7 @@ class CurrentIndexNotifier extends StateNotifier<int> {
   final int _maxIndex;
 
   void plus() {
-    if (state + 1 >= _maxIndex) {
+    if (state + 1 > _maxIndex) {
       state = 0;
     } else {
       state++;
@@ -21,7 +21,7 @@ class CurrentIndexNotifier extends StateNotifier<int> {
   }
 
   void minus() {
-    if (state - 1 <= 0) {
+    if (state - 1 < 0) {
       state = _maxIndex;
     } else {
       state--;
